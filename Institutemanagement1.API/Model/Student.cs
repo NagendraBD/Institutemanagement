@@ -17,6 +17,6 @@ namespace Institutemanagement1.API.Model
 
         public string Address { get; set; }
 
-        public DateTime DateOfBirth { get; set; }
+        //public DateTime DateOfBirth { get; set; }
     }
 }
