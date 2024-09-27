@@ -27,20 +27,29 @@ namespace Institutemanagement1.API.Controllers
             }
         };
 
-        // https://localhost:7204/api/students
+        // GET : https://localhost:7204/api/students
         [HttpGet]
         public ActionResult<IEnumerable<Student>> GetStudents()
         {
             return Ok(students);
         }
 
-        // https://localhost:7204/api/students/1
+        // GET : https://localhost:7204/api/students/1
         [HttpGet]
         [Route("{id:int}")]
-        public ActionResult<IEnumerable<Student>> GetStudent()
+        public ActionResult<IEnumerable<Student>> GetStudent(int id)
         {
-            var student = students.FirstOrDefault(s => s.Id == 1);
+            var student = students.FirstOrDefault(s => s.Id == id);
             return Ok(student);
+        }
+
+        // POST : https://localhost:7204/api/students
+        [HttpPost]
+        public ActionResult<Student> Create(Student newStudent)
+        {
+            newStudent.Id = students.Max(s => s.Id) + 1;
+            students.Add(newStudent);
+            return CreatedAtAction(nameof(GetStudent), new { id = newStudent.Id }, newStudent);
         }
 
 
