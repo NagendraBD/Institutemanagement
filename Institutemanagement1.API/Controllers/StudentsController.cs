@@ -53,7 +53,13 @@ namespace Institutemanagement1.API.Controllers
         }
 
 
-
+        [HttpPost]
+        public ActionResult<Student> Update(Student newStudent)
+        {
+            newStudent.Id = students.Max(s => s.Id) + 1;
+            students.Add(newStudent);
+            return CreatedAtAction(nameof(GetStudent), new { id = newStudent.Id }, newStudent);
+        }
 
 
     }
