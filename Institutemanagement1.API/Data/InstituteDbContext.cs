@@ -10,6 +10,6 @@ namespace Institutemanagement1.API.Data
             
         }
 
-        DbSet<Student> Students { get; set; }
+        public DbSet<Student> Students { get; set; }
     }
 }

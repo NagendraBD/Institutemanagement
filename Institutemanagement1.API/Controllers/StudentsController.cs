@@ -1,5 +1,7 @@
-﻿using Institutemanagement1.API.Model;
+﻿using Institutemanagement1.API.Data;
+using Institutemanagement1.API.Model;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace Institutemanagement1.API.Controllers
 {
@@ -7,30 +9,18 @@ namespace Institutemanagement1.API.Controllers
     [Route("api/[controller]")]
     public class StudentsController : ControllerBase
     {
-        private static List<Student> students = new List<Student>()
+        private readonly InstituteDbContext _dbContext;
+
+        public StudentsController(InstituteDbContext dbContext)
         {
-            new Student
-            {
-                Id = 1,
-                Name = "Nagendra",
-                Mobile = "9980521811",
-                Email = "nagendraprasadbd@gmail.com",
-                Address = "Bangalore"
-            },
-            new Student
-            {
-                Id = 2,
-                Name = "Prasad",
-                Mobile = "9980521822",
-                Email = "prasadbd@gmail.com",
-                Address = "Bangalore"
-            }
-        };
+            this._dbContext = dbContext;
+        }
 
         // GET : https://localhost:7204/api/students
         [HttpGet]
-        public ActionResult<IEnumerable<Student>> GetStudents()
+        public async Task<ActionResult> GetStudents()
         {
+            var students = await _dbContext.Students.ToListAsync();
             return Ok(students);
         }
 
@@ -39,7 +29,7 @@ namespace Institutemanagement1.API.Controllers
         [Route("{id:int}")]
         public ActionResult<IEnumerable<Student>> GetStudent(int id)
         {
-            var student = students.FirstOrDefault(s => s.Id == id);
+            var student = _dbContext.Students.FirstOrDefault(s => s.Id == id);
             return Ok(student);
         }
 
@@ -47,18 +37,26 @@ namespace Institutemanagement1.API.Controllers
         [HttpPost]
         public ActionResult<Student> Create(Student newStudent)
         {
-            newStudent.Id = students.Max(s => s.Id) + 1;
-            students.Add(newStudent);
+          
+            _dbContext.Students.Add(newStudent);
+            _dbContext.SaveChangesAsync();
             return CreatedAtAction(nameof(GetStudent), new { id = newStudent.Id }, newStudent);
         }
 
 
-        [HttpPost]
-        public ActionResult<Student> Update(Student newStudent)
+        [HttpPut]
+        public async Task<ActionResult> Update(int id, Student newStudent)
         {
-            newStudent.Id = students.Max(s => s.Id) + 1;
-            students.Add(newStudent);
-            return CreatedAtAction(nameof(GetStudent), new { id = newStudent.Id }, newStudent);
+            var student = await _dbContext.Students.FindAsync(id);
+
+            student.Name = newStudent.Name;
+            student.Mobile = newStudent.Mobile;
+            student.Email = newStudent.Email;
+            student.Address = newStudent.Address;
+
+            await _dbContext.SaveChangesAsync();
+
+            return NoContent();
         }
 
 
